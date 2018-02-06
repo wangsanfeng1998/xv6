@@ -236,6 +236,10 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
   if(newsz < oldsz)
     return oldsz;
 
+  if (oldsz == 0 || oldsz < PGSIZE) {
+    oldsz = PGSIZE;
+  }
+
   a = PGROUNDUP(oldsz);
   for(; a < newsz; a += PGSIZE){
     mem = kalloc();
@@ -244,7 +248,7 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
       deallocuvm(pgdir, newsz, oldsz);
       return 0;
     }
-    memset(mem, 0, PGSIZE);
+    memset(mem, 0, PGSIZE); //clearing the page at mem by filling it with all zeroes
     mappages(pgdir, (char*)a, PGSIZE, PADDR(mem), PTE_W|PTE_U);
   }
   return newsz;
@@ -306,7 +310,7 @@ copyuvm(pde_t *pgdir, uint sz)
 
   if((d = setupkvm()) == 0)
     return 0;
-  for(i = 0; i < sz; i += PGSIZE){
+  for(i = PGSIZE; i < sz; i += PGSIZE){ //change from zero to pgsize
     if((pte = walkpgdir(pgdir, (void*)i, 0)) == 0)
       panic("copyuvm: pte should exist");
     if(!(*pte & PTE_P))
