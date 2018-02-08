@@ -15,6 +15,13 @@ char *echoargv[] = { "echo", "ALL", "TESTS", "PASSED", 0 };
 int stdout = 1;
 
 // simple file system tests
+//void 
+//partOneTest(void)
+
+  //int *ptr; 
+  //ptr = NULL;
+  //int c = *ptr; 
+  //printf(stdout, "Dereference of null pointer %d successful \n
 
 void
 opentest(void)
@@ -1461,7 +1468,6 @@ void
 bigargtest(void)
 {
   int pid;
-
   pid = fork();
   if(pid == 0){
     char *args[32+1];
@@ -1490,7 +1496,7 @@ main(int argc, char *argv[])
     exit();
   }
   close(open("usertests.ran", O_CREATE));
-
+  
   bigargtest();
   bsstest();
   sbrktest();
@@ -1520,8 +1526,12 @@ main(int argc, char *argv[])
   iref();
   forktest();
   bigdir(); // slow
-
+  
+  printf(stdout, "Starting part 1 test \n");
+  int *ptr;
+  ptr = NULL;
+  int c = *ptr;
+  printf(stdout, "Null pointer de-referenced %d", c);
   exectest();
-
   exit();
 }
