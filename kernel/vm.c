@@ -389,6 +389,27 @@ shmem_init()
 void*
 shmem_access(int page_number) //this code was taken from the Github user yanhui-yang
 {
+  /*
+	// Invalid page number
+  if(page_number < 0 || page_number > 3)
+    return NULL;
+  // Check if already has access to the given page
+  if(proc->shmems[page_number] != 0)
+    return proc->shmems[page_number];
+  // Check if the address space is full
+  void* va = (void*) (USERTOP - (proc->num_shmems + 1) * PGSIZE);
+  if(proc->sz >= (int) va)
+    return NULL;
+  // If VA is available, grant the access  
+ // if (mappages(proc->pgdir, va, PGSIZE, (uint)shmems_address[page_number], PTE_W|PTE_U) == -1)
+    //panic("shmem_access");
+  proc->shmems[page_number] = va;
+  proc->num_shmems += 1;
+  shmems_counter[page_number] += 1;
+  return va;
+  */
+
+ 
   if (page_number < 0 || page_number >= MAXPGS || proc->num_shmems < 0 || proc->num_shmems >= MAXPGS) {
     return NULL; //if page number is out of range (whether that's above or below), or number of shared memories is negative or beyond 4 pages
   }
@@ -407,7 +428,7 @@ shmem_access(int page_number) //this code was taken from the Github user yanhui-
   }
   //test if there is enough phsyical memory to create a page using the kalloc function
   if ((shmems_address[page_number] = kalloc()) == 0) {
-    panic("shmem_access: unable to allocate physical shared memory page");
+    //panic("shmem_access: unable to allocate physical shared memory page");
   }
   if (mappages(proc->pgdir, newSharedMemoryPageAddr, PGSIZE, PADDR(shmems_address[page_number]), PTE_W|PTE_U) < 0){
    return NULL;//again, check if there is room to make a PTE in the page directory
@@ -416,7 +437,9 @@ shmem_access(int page_number) //this code was taken from the Github user yanhui-
   shmems_counter[page_number]++; //increase the number of processes that are sharing this page
   proc->shmems[page_number] = newSharedMemoryPageAddr; //set the value to point towards the new address
   return newSharedMemoryPageAddr;
+  
 }
+
 
 int
 shmem_count(int page_number)
@@ -424,5 +447,5 @@ shmem_count(int page_number)
   // if page number is out of range (whether that's above or below), or number of shared memories is negative or beyond 4 pages
   if(page_number < 0 || page_number >= MAXPGS || proc->num_shmems < 0 || proc->num_shmems >= MAXPGS)
     return -1;
-  return shmems_counter[page_number];
+  return shmems_counter[page_number] ;
 }
