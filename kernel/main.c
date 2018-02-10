@@ -60,8 +60,10 @@ mainc(void)
 
   // Finish setting up this processor in
   cinit();
+  //shmem_init();    // initialize shared memory data structures
   sti();           // enable inturrupts
   userinit();      // first user process
+  shmem_init();
   scheduler();     // start running processes
 }
 

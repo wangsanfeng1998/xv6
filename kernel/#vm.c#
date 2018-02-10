@@ -389,9 +389,9 @@ shmem_init()
 void*
 shmem_access(int page_number)
 {
-  if(page_number < 0 || page_number >= MAXPGS || proc->num_shmems < 0 || proc->num_shmems >= MAXPGS)
+  if(page_number < 0 || page_number >= MAXPGS || proc-num_shmems < 0 || proc->num_shmems >= MAXPGS)
     return NULL;
-  return NULL;
+  
 }
 
 int
