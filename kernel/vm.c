@@ -387,13 +387,13 @@ shmem_init()
 }
 
 void*
-shmem_access(int page_number)
+shmem_access(int page_number) //this code was taken from the Github user yanhui-yang
 {
   if (page_number < 0 || page_number >= MAXPGS || proc->num_shmems < 0 || proc->num_shmems >= MAXPGS) {
     return NULL; //if page number is out of range (whether that's above or below), or number of shared memories is negative or beyond 4 pages
   }
   if (proc->shmems[page_number]) { //if the process is already capable of accessing the given page
-    if (mappages(proc->pgdir, proc->shmems[page_number], PGSIZE, PADDR(shmems_addr[page_number]), PTE_W|PTE_U) < 0) {
+    if (mappages(proc->pgdir, proc->shmems[page_number], PGSIZE, PADDR(shmems_address[page_number]), PTE_W|PTE_U) < 0) {
       return NULL; //if there is no room in the page directory, there is an error
     }
     return proc->shmems[page_number]; //if the page can already be accessed, we just return it
@@ -409,7 +409,7 @@ shmem_access(int page_number)
   if ((shmems_addr[page_number] = kalloc()) == 0) {
     panic("shmem_access: unable to allocate physical shared memory page");
   }
-  if (mappages(proc->pgdir, newSharedMemoryPageAddr, PGSIZE, PADDR(shmems_addr[page_number]), PTE_W|PTE_U) < 0){
+  if (mappages(proc->pgdir, newSharedMemoryPageAddr, PGSIZE, PADDR(shmems_address[page_number]), PTE_W|PTE_U) < 0){
    return NULL;//again, check if there is room to make a PTE in the page directory
  }
   proc->num_shmems++; //increase the number of pages this process is sharing
