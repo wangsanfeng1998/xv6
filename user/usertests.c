@@ -1533,5 +1533,8 @@ main(int argc, char *argv[])
   int c = *ptr;
   printf(stdout, "Null pointer de-referenced %d", c);
   exectest();
+
+  printf(stdout, "Starting part 2 test \n");
+  
   exit();
 }

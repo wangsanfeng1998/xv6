@@ -389,9 +389,33 @@ shmem_init()
 void*
 shmem_access(int page_number)
 {
-  if(page_number < 0 || page_number >= MAXPGS || proc->num_shmems < 0 || proc->num_shmems >= MAXPGS)
+  if (page_number < 0 || page_number >= MAXPGS || proc->num_shmems < 0 || proc->num_shmems >= MAXPGS) {
+    return NULL; //if page number is out of range (whether that's above or below), or number of shared memories is negative or beyond 4 pages
+  }
+  if (proc->shmems[page_number]) { //if the process is already capable of accessing the given page
+    if (mappages(proc->pgdir, proc->shmems[page_number], PGSIZE, PADDR(shmems_addr[page_number]), PTE_W|PTE_U) < 0) {
+      return NULL; //if there is no room in the page directory, there is an error
+    }
+    return proc->shmems[page_number]; //if the page can already be accessed, we just return it
+  }
+  //make a new pointer to the address to the next page, starting from the top of the virtual address space
+  //for every preceding page, we move further down the virtual address space
+  void *newSharedMemoryPageAddr = (void *)(USERTOP - (proc->num_shmems + 1) * PGSIZE); 
+  //if the address space is already filled, there is an error
+  if (proc->sz >= (int)newSharedMemoryPageAddr) { 
     return NULL;
-  return NULL;
+  }
+  //test if there is enough phsyical memory to create a page using the kalloc function
+  if ((shmems_addr[page_number] = kalloc()) == 0) {
+    panic("shmem_access: unable to allocate physical shared memory page");
+  }
+  if (mappages(proc->pgdir, newSharedMemoryPageAddr, PGSIZE, PADDR(shmems_addr[page_number]), PTE_W|PTE_U) < 0){
+   return NULL;//again, check if there is room to make a PTE in the page directory
+ }
+  proc->num_shmems++; //increase the number of pages this process is sharing
+  shmems_counter[page_number]++; //increase the number of processes that are sharing this page
+  proc->shmems[page_number] = newSharedMemoryPageAddr; //set the value to point towards the new address
+  return newSharedMemoryPageAddr;
 }
 
 int
