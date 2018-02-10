@@ -406,7 +406,7 @@ shmem_access(int page_number) //this code was taken from the Github user yanhui-
     return NULL;
   }
   //test if there is enough phsyical memory to create a page using the kalloc function
-  if ((shmems_addr[page_number] = kalloc()) == 0) {
+  if ((shmems_address[page_number] = kalloc()) == 0) {
     panic("shmem_access: unable to allocate physical shared memory page");
   }
   if (mappages(proc->pgdir, newSharedMemoryPageAddr, PGSIZE, PADDR(shmems_address[page_number]), PTE_W|PTE_U) < 0){
