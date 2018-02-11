@@ -171,6 +171,8 @@ int             copyout(pde_t*, uint, void*, uint);
 void            shmem_init(void);
 int             shmem_count(int);
 void*           shmem_access(int);
+void            freeshmems(struct proc*);
+void            forkshmems(struct proc*);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

@@ -235,7 +235,7 @@ allocuvm(pde_t *pgdir, uint oldsz, uint newsz)
   char *mem;
   uint a;
 
-  if(newsz > USERTOP)
+  if(newsz + PGSIZE * (1 + proc->num_shmems)> USERTOP)
     return 0;
   if(newsz < oldsz)
     return oldsz;
@@ -294,12 +294,31 @@ freevm(pde_t *pgdir)
 
   if(pgdir == 0)
     panic("freevm: no pgdir");
-  deallocuvm(pgdir, USERTOP, 0);
+  deallocuvm(pgdir, USERTOP - MAXPGS * PGSIZE, 0);
   for(i = 0; i < NPDENTRIES; i++){
     if(pgdir[i] & PTE_P)
       kfree((char*)PTE_ADDR(pgdir[i]));
   }
   kfree((char*)pgdir);
+}
+
+void
+freeshmems(struct proc *p) {
+  int i;
+  for (i = 0; i < MAXPGS; i++) {
+    if(p->shmems[i]) {
+      if (shmems_counter[i] == 1 && shmems_address[i]) kfree((char*)shmems_address[i]);
+      shmems_counter[i]--;
+    }    
+  }
+}
+
+void
+forkshmems(struct proc *p) {
+  int i;
+  for (i = 0; i < MAXPGS; i++)
+    if(proc->shmems[i])
+      shmems_counter[i]++;
 }
 
 // Given a parent process's page table, create a copy
@@ -447,5 +466,5 @@ shmem_count(int page_number)
   // if page number is out of range (whether that's above or below), or number of shared memories is negative or beyond 4 pages
   if(page_number < 0 || page_number >= MAXPGS || proc->num_shmems < 0 || proc->num_shmems >= MAXPGS)
     return -1;
-  return shmems_counter[page_number] ;
+  return shmems_counter[page_number];
 }
