@@ -407,28 +407,7 @@ shmem_init()
 
 void*
 shmem_access(int page_number) //this code was taken from the Github user yanhui-yang
-{
-  /*
-	// Invalid page number
-  if(page_number < 0 || page_number > 3)
-    return NULL;
-  // Check if already has access to the given page
-  if(proc->shmems[page_number] != 0)
-    return proc->shmems[page_number];
-  // Check if the address space is full
-  void* va = (void*) (USERTOP - (proc->num_shmems + 1) * PGSIZE);
-  if(proc->sz >= (int) va)
-    return NULL;
-  // If VA is available, grant the access  
- // if (mappages(proc->pgdir, va, PGSIZE, (uint)shmems_address[page_number], PTE_W|PTE_U) == -1)
-    //panic("shmem_access");
-  proc->shmems[page_number] = va;
-  proc->num_shmems += 1;
-  shmems_counter[page_number] += 1;
-  return va;
-  */
-
- 
+{ 
   if (page_number < 0 || page_number >= MAXPGS || proc->num_shmems < 0 || proc->num_shmems >= MAXPGS) {
     return NULL; //if page number is out of range (whether that's above or below), or number of shared memories is negative or beyond 4 pages
   }
